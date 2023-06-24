@@ -29,9 +29,9 @@ class PriceLoader:
         return respdict
 
     def _make_settlement_datetime(self, df: pd.DataFrame) -> pd.DataFrame:
-        df["settlementDatetime"] = df["settlementDate"] + (
+        df = df.assign(settlementDatetime = df["settlementDate"] + (
             30 * (df["settlementPeriod"] - 1)
-        ).astype("timedelta64[m]")
+        ).astype("timedelta64[m]"))
         return df
 
     def _make_settlement_dates(self, year: str, month: str) -> tuple[(str, str)]:
@@ -55,6 +55,7 @@ class PriceLoader:
                 "systemSellPrice": "float64",
             }
         )
+        df = df.query("settlementDate.dt.month == @month")
         df = self._make_settlement_datetime(df)
         return df
 
